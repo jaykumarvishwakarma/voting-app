@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+  name     String
+  phone    String
+  vote     Vote? // ✅ One-to-one: a user has at most one vote
+}
+
+model Entity {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  votes Vote[]
+}
+
+model Vote {
+  id       Int    @id @default(autoincrement())
+  userId   Int    @unique // ✅ Each user can vote only once
+  entityId Int
+  user     User   @relation(fields: [userId], references: [id])
+  entity   Entity @relation(fields: [entityId], references: [id])
+}
